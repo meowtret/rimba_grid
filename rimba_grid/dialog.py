@@ -179,8 +179,9 @@ class RimbaGridDialog(QDialog):
         main.addWidget(self.g_style)
 
         bb = QDialogButtonBox()
-        self.btn_apply = bb.addButton("Terapkan", QDialogButtonBox.ApplyRole)
-        bb.addButton("Tutup", QDialogButtonBox.RejectRole)
+        role = QDialogButtonBox.ButtonRole
+        self.btn_apply = bb.addButton("Terapkan", role.ApplyRole)
+        bb.addButton("Tutup", role.RejectRole)
         self.btn_apply.clicked.connect(self.apply)
         bb.rejected.connect(self.reject)
         main.addWidget(bb)

@@ -205,11 +205,24 @@ def auto_interval(span_deg, target=3):
 # Penerapan ke layout
 # ---------------------------------------------------------------------------
 
+# Enum dengan nama kelompok lengkap (wajib untuk Qt6 / QGIS 4,
+# tetap berlaku di QGIS 3)
+_G = QgsLayoutItemMapGrid
+GridUnit = _G.GridUnit
+GridStyle = _G.GridStyle
+FrameStyle = _G.FrameStyle
+AnnFmt = _G.AnnotationFormat
+AnnPos = _G.AnnotationPosition
+AnnDir = _G.AnnotationDirection
+Side = _G.BorderSide
+Display = _G.DisplayMode
+
+
 def _points_unit():
     try:
         return Qgis.RenderUnit.Points
     except AttributeError:  # QGIS < 3.30
-        return QgsUnitTypes.RenderPoints
+        return QgsUnitTypes.RenderUnit.RenderPoints
 
 
 def make_text_format(family="Arial", size=7.0, color="#000000", bold=False):
@@ -233,7 +246,7 @@ def grid_crs(grid, map_item):
 def apply_label_format(grid, expression):
     """Hanya ganti format label grid menjadi BT/BB LU/LS."""
     grid.setAnnotationEnabled(True)
-    grid.setAnnotationFormat(QgsLayoutItemMapGrid.CustomFormat)
+    grid.setAnnotationFormat(AnnFmt.CustomFormat)
     grid.setAnnotationExpression(expression)
 
 
@@ -246,19 +259,18 @@ def configure_grid(grid, opts):
       line_color, line_width, font_family, font_size, font_color, font_bold,
       side_vertical (bool), annot_inside (bool), annot_distance, expression
     """
-    G = QgsLayoutItemMapGrid
     grid.setEnabled(True)
     grid.setCrs(QgsCoordinateReferenceSystem("EPSG:4326"))
-    grid.setUnits(G.MapUnit)
+    grid.setUnits(GridUnit.MapUnit)
     grid.setIntervalX(opts["interval_x"])
     grid.setIntervalY(opts["interval_y"])
     grid.setOffsetX(0)
     grid.setOffsetY(0)
 
     style = {
-        "lines": G.Solid,
-        "cross": G.Cross,
-        "frame": G.FrameAnnotationsOnly,
+        "lines": GridStyle.Solid,
+        "cross": GridStyle.Cross,
+        "frame": GridStyle.FrameAnnotationsOnly,
     }[opts.get("style", "lines")]
     grid.setStyle(style)
     if opts.get("style") == "cross":
@@ -272,24 +284,24 @@ def configure_grid(grid, opts):
         grid.setLineSymbol(sym)
 
     frame = {
-        "zebra": G.Zebra,
-        "zebra_nautical": getattr(G, "ZebraNautical", G.Zebra),
-        "line": G.LineBorder,
-        "ticks_in": G.InteriorTicks,
-        "ticks_out": G.ExteriorTicks,
-        "none": G.NoFrame,
+        "zebra": FrameStyle.Zebra,
+        "zebra_nautical": FrameStyle.ZebraNautical,
+        "line": FrameStyle.LineBorder,
+        "ticks_in": FrameStyle.InteriorTicks,
+        "ticks_out": FrameStyle.ExteriorTicks,
+        "none": FrameStyle.NoFrame,
     }[opts.get("frame", "zebra")]
     grid.setFrameStyle(frame)
     grid.setFrameWidth(opts.get("frame_width", 1.5))
     grid.setFramePenSize(opts.get("frame_pen", 0.2))
     grid.setFramePenColor(QColor("#000000"))
-    if frame in (G.Zebra, getattr(G, "ZebraNautical", G.Zebra)):
+    if frame in (FrameStyle.Zebra, FrameStyle.ZebraNautical):
         grid.setFrameFillColor1(QColor("#ffffff"))
         grid.setFrameFillColor2(QColor("#000000"))
 
     # Anotasi
     grid.setAnnotationEnabled(True)
-    grid.setAnnotationFormat(G.CustomFormat)
+    grid.setAnnotationFormat(AnnFmt.CustomFormat)
     grid.setAnnotationExpression(opts["expression"])
     grid.setAnnotationTextFormat(make_text_format(
         opts.get("font_family", "Arial"), opts.get("font_size", 7.0),
@@ -297,14 +309,19 @@ def configure_grid(grid, opts):
     grid.setAnnotationFrameDistance(opts.get("annot_distance", 1.0))
     grid.setAnnotationPrecision(0)
 
-    pos = G.InsideMapFrame if opts.get("annot_inside") else G.OutsideMapFrame
+    if opts.get("annot_inside"):
+        pos = AnnPos.InsideMapFrame
+    else:
+        pos = AnnPos.OutsideMapFrame
     vertical = opts.get("side_vertical", True)
+    horiz = AnnDir.Horizontal
     sides = {
-        G.Left: (G.LatitudeOnly, G.Vertical if vertical else G.Horizontal),
-        G.Right: (G.LatitudeOnly,
-                  G.VerticalDescending if vertical else G.Horizontal),
-        G.Top: (G.LongitudeOnly, G.Horizontal),
-        G.Bottom: (G.LongitudeOnly, G.Horizontal),
+        Side.Left: (Display.LatitudeOnly,
+                    AnnDir.Vertical if vertical else horiz),
+        Side.Right: (Display.LatitudeOnly,
+                     AnnDir.VerticalDescending if vertical else horiz),
+        Side.Top: (Display.LongitudeOnly, horiz),
+        Side.Bottom: (Display.LongitudeOnly, horiz),
     }
     for side, (display, direction) in sides.items():
         grid.setAnnotationDisplay(display, side)

@@ -37,7 +37,7 @@ Plugin QGIS untuk membuat grid koordinat di **Print Layout** dengan label gaya p
 
 ## Kompatibilitas
 
-QGIS 3.16 – 3.x. Diuji di QGIS 3.34.
+QGIS 3.16 – 4.x (kode sudah memakai enum gaya Qt6). Diuji di QGIS 3.34.
 
 ## Lisensi
 

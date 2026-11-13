@@ -6,7 +6,10 @@ import os
 from qgis.core import Qgis, QgsMessageLog
 
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction
+try:  # Qt6 / QGIS 4: QAction ada di QtGui
+    from qgis.PyQt.QtGui import QAction
+except ImportError:  # Qt5 / QGIS 3
+    from qgis.PyQt.QtWidgets import QAction
 
 MENU = "&Rimba Grid"
 
@@ -38,7 +41,7 @@ class RimbaGridPlugin:
         except (AttributeError, RuntimeError) as err:
             QgsMessageLog.logMessage(
                 "Gagal menambah ikon ke Layout Designer: {}".format(err),
-                "Rimba Grid", Qgis.Warning)
+                "Rimba Grid", Qgis.MessageLevel.Warning)
 
     def unload(self):
         try:
@@ -46,7 +49,7 @@ class RimbaGridPlugin:
         except (TypeError, RuntimeError):
             QgsMessageLog.logMessage(
                 "Sinyal Layout Designer sudah terputus.", "Rimba Grid",
-                Qgis.Info)
+                Qgis.MessageLevel.Info)
         self.iface.removePluginMenu(MENU, self.action)
         self.iface.removeToolBarIcon(self.action)
         if self.dlg:
