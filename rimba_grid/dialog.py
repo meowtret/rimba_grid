@@ -112,8 +112,11 @@ class RimbaGridDialog(QDialog):
         f.addRow("Pemisah desimal", self.cb_sep)
         self.chk_pad = QCheckBox("Menit/detik dua digit (00)")
         self.chk_space = QCheckBox("Spasi sebelum BT/LS")
+        self.chk_spaced = QCheckBox(
+            "Spasi antar derajat-menit-detik (122° 33' 0\")")
         f.addRow("", self.chk_pad)
         f.addRow("", self.chk_space)
+        f.addRow("", self.chk_spaced)
         self.lbl_preview = QLabel()
         self.lbl_preview.setStyleSheet("font-weight:bold;")
         f.addRow("Contoh", self.lbl_preview)
@@ -196,6 +199,7 @@ class RimbaGridDialog(QDialog):
         self.sp_dec.valueChanged.connect(self.update_preview)
         self.chk_pad.toggled.connect(self.update_preview)
         self.chk_space.toggled.connect(self.update_preview)
+        self.chk_spaced.toggled.connect(self.update_preview)
 
     # ------------------------------------------------------------ settings
     def _load_settings(self):
@@ -208,6 +212,7 @@ class RimbaGridDialog(QDialog):
         self._set_combo(self.cb_sep, g("sep", ","))
         self.chk_pad.setChecked(g("pad", True, bool))
         self.chk_space.setChecked(g("space", True, bool))
+        self.chk_spaced.setChecked(g("spaced", False, bool))
         self._set_combo(self.cb_style, g("style", "lines"))
         self.btn_line_color.setColor(QColor(g("line_color", "#000000")))
         self.sp_line_w.setValue(g("line_w", 0.15, float))
@@ -228,6 +233,7 @@ class RimbaGridDialog(QDialog):
             "fmt": self.cb_fmt.currentData(), "dec": self.sp_dec.value(),
             "sep": self.cb_sep.currentData(), "pad": self.chk_pad.isChecked(),
             "space": self.chk_space.isChecked(),
+            "spaced": self.chk_spaced.isChecked(),
             "style": self.cb_style.currentData(),
             "line_color": self.btn_line_color.color().name(),
             "line_w": self.sp_line_w.value(),
@@ -318,7 +324,8 @@ class RimbaGridDialog(QDialog):
         return dict(
             fmt=self.cb_fmt.currentData(), decimals=self.sp_dec.value(),
             pad=self.chk_pad.isChecked(), dec_sep=self.cb_sep.currentData(),
-            space=self.chk_space.isChecked())
+            space=self.chk_space.isChecked(),
+            spaced=self.chk_spaced.isChecked())
 
     def update_preview(self):
         o = self.label_options()

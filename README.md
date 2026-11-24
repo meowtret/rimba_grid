@@ -15,6 +15,7 @@ Plugin QGIS untuk membuat grid koordinat di **Print Layout** dengan label gaya p
 - Mode **Hanya ganti label**: interval, bingkai, dan huruf grid lama dipertahankan.
 - Interval diisi dalam derajat-menit-detik, dengan tombol hitung otomatis dari luas peta.
 - Format DMS, derajat-menit, atau derajat desimal, dengan pemisah desimal koma atau titik.
+- Opsi spasi antar komponen dan detik tanpa nol depan, untuk format seperti `122° 33' 0" BT`.
 - Bingkai zebra, zebra nautikal, garis tepi, atau tick. Label LU/LS vertikal di sisi kiri-kanan.
 - Label disimpan sebagai **ekspresi kustom** grid layout, jadi proyek tetap tampil benar walau dibuka tanpa plugin.
 - Perubahan bisa dibatalkan (Ctrl+Z) di Layout Designer.

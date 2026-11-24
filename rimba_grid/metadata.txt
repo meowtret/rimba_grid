@@ -5,7 +5,7 @@ qgisMaximumVersion=4.99
 description=Grid koordinat Print Layout berlabel BT/BB dan LU/LS (Indonesian-style map grid labels).
 about=Membuat atau mengubah grid geografis pada item peta di Print Layout dengan label gaya Indonesia: Bujur Timur/Bujur Barat (BT/BB) dan Lintang Utara/Lintang Selatan (LU/LS), misalnya 122°56'00" BT dan 0°42'00" LS. Label disimpan sebagai ekspresi grid kustom, sehingga layout tetap tampil benar walau dibuka tanpa plugin. Fitur: format DMS/DM/desimal, interval otomatis, bingkai zebra/tick, label vertikal di sisi kiri-kanan, dan mode "hanya ganti label" untuk grid yang sudah ada.
  English: Creates or updates geographic map grids in Print Layouts with Indonesian hemisphere labels (BT/BB = east/west longitude, LU/LS = north/south latitude).
-version=0.1.1
+version=0.1.2
 author=Alfian (Ian)
 email=alfianq2@gmail.com
 tags=grid, graticule, layout, print layout, coordinates, indonesia, DMS, label
@@ -16,5 +16,6 @@ category=Plugins
 icon=icon.png
 experimental=True
 deprecated=False
-changelog=0.1.1 - Kompatibel Qt6/QGIS 4: semua enum ditulis dengan nama kelompok lengkap; qgisMaximumVersion=4.99.
+changelog=0.1.2 - Opsi spasi antar derajat-menit-detik (122° 33' 0" BT), mengikuti format peta Kemenhut.
+ 0.1.1 - Kompatibel Qt6/QGIS 4: semua enum ditulis dengan nama kelompok lengkap; qgisMaximumVersion=4.99.
  0.1.0 - Rilis pertama: grid BT/BB LU/LS, format DMS/DM/DD, interval otomatis, mode hanya-label.

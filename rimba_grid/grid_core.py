@@ -59,15 +59,18 @@ def _padded_number(var, pad, decimals, dec_sep):
 
 def build_label_expression(fmt=FMT_DMS, decimals=0, pad=True, dec_sep=",",
                            space=True, lon_pos="BT", lon_neg="BB",
-                           lat_pos="LU", lat_neg="LS"):
+                           lat_pos="LU", lat_neg="LS", spaced=False):
     """
     Kembalikan string ekspresi QGIS untuk anotasi grid kustom.
 
     Variabel yang tersedia di konteks anotasi grid: @grid_number, @grid_axis.
     Nilai 0 (ekuator / meridian 0) ditulis tanpa akhiran.
+    spaced=True menyisipkan spasi antar komponen: 122° 33' 0" BT.
     """
     decimals = max(0, int(decimals))
     sp = " " if space else ""
+    deg_mark = _q("° " if spaced else "°")
+    gap = " || ' '" if spaced else ""
     suffix = (
         "CASE WHEN @_t = 0 THEN '' "
         "WHEN @grid_axis = 'x' THEN if(@grid_number > 0, {lp}, {ln}) "
@@ -83,8 +86,9 @@ def build_label_expression(fmt=FMT_DMS, decimals=0, pad=True, dec_sep=",",
         if pad:
             min_txt = "lpad({m}, 2, '0')".format(m=min_txt)
         body = (
-            "{d} || '°' || {m} || {ap} || {s} || {qu}"
-        ).format(d=deg_txt, m=min_txt, s=sec_txt, ap=_APOS, qu=_QUOT)
+            "{d} || {dm} || {m} || {ap}{gap} || {s} || {qu}"
+        ).format(d=deg_txt, dm=deg_mark, m=min_txt, s=sec_txt, ap=_APOS,
+                 qu=_QUOT, gap=gap)
         return (
             "with_variable('_t', round(abs(@grid_number) * 3600, {dec}),"
             " with_variable('_d', floor(@_t / 3600),"
@@ -95,8 +99,8 @@ def build_label_expression(fmt=FMT_DMS, decimals=0, pad=True, dec_sep=",",
 
     if fmt == FMT_DM:
         min_txt = _padded_number("@_m", pad, decimals, dec_sep)
-        body = "{d} || '°' || {m} || {ap}".format(
-            d=deg_txt, m=min_txt, ap=_APOS)
+        body = "{d} || {dm} || {m} || {ap}".format(
+            d=deg_txt, dm=deg_mark, m=min_txt, ap=_APOS)
         return (
             "with_variable('_t', round(abs(@grid_number) * 60, {dec}),"
             " with_variable('_d', floor(@_t / 60),"
@@ -113,9 +117,11 @@ def build_label_expression(fmt=FMT_DMS, decimals=0, pad=True, dec_sep=",",
 
 
 def format_label_py(value, axis, fmt=FMT_DMS, decimals=0, pad=True,
-                    dec_sep=",", space=True):
+                    dec_sep=",", space=True, spaced=False):
     """Versi Python dari ekspresi di atas (untuk pratinjau di dialog)."""
     sp = " " if space else ""
+    dm = "° " if spaced else "°"
+    gap = " " if spaced else ""
 
     def round(x, dec=0):  # noqa: A001
         # pembulatan setengah ke atas, sama seperti fungsi round() QGIS
@@ -137,12 +143,13 @@ def format_label_py(value, axis, fmt=FMT_DMS, decimals=0, pad=True,
         m = math.floor((t - d * 3600) / 60)
         s = t - d * 3600 - m * 60
         mm = str(int(m)).zfill(2) if pad else str(int(m))
-        body = "{}°{}'{}\"".format(int(d), mm, num(s, pad, decimals))
+        sec = num(s, pad, decimals)
+        body = "{}{}{}'{}{}\"".format(int(d), dm, mm, gap, sec)
     elif fmt == FMT_DM:
         t = round(abs(value) * 60, decimals)
         d = math.floor(t / 60)
         m = t - d * 60
-        body = "{}°{}'".format(int(d), num(m, pad, decimals))
+        body = "{}{}{}'".format(int(d), dm, num(m, pad, decimals))
     else:
         t = round(abs(value), decimals)
         body = "{}°".format(num(t, False, decimals))
