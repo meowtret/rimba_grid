@@ -380,7 +380,9 @@ class RimbaGridDialog(QDialog):
                 return
 
         layout = m.layout()
-        layout.undoStack().beginMacro("Rimba Grid")
+        # beginCommand merekam keadaan item peta (termasuk grid-nya)
+        # sebelum dan sesudah, sehingga Ctrl+Z di Layout Designer bekerja.
+        layout.undoStack().beginCommand(m, "Rimba Grid")
         try:
             if grid is None:
                 from qgis.core import QgsLayoutItemMapGrid
@@ -392,7 +394,7 @@ class RimbaGridDialog(QDialog):
                 core.configure_grid(grid, self.grid_options(expr))
             core.refresh_map(m)
         finally:
-            layout.undoStack().endMacro()
+            layout.undoStack().endCommand()
 
         self._save_settings()
         gid = grid.id()
